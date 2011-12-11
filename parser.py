@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import re
 import codecs
-from pprint import pprint
 
 EOR = u"=========="
 
