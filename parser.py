@@ -18,8 +18,12 @@ def records(file_path):
 			clip['title'], clip['attribution'] =match.groups() 
 			clip['attribution'] = clip['attribution'].split( ') (' )
 
-			match = re.match( r'- (\w+) on Page (\d+) \| Loc. ([^|]+)\| Added on (\w+), (\w+ \d+, \d+), (\d+:\d+ \w\w)', record[1] )
-			clip['type'], clip['page'], clip['location'], clip['dow'], clip['date'], clip['time'] = match.groups()
+			try:
+				match = re.match( r'- (\w+) on Page (\d+) \| Loc. ([^|]+)\| Added on (\w+), (\w+ \d+, \d+), (\d+:\d+ \w\w)', record[1] )
+				clip['type'], clip['page'], clip['location'], clip['dow'], clip['date'], clip['time'] = match.groups()
+			except AttributeError:
+				match = re.match( r'- (\w+) Loc. ([^|]+)\| Added on (\w+), (\w+ \d+, \d+), (\d+:\d+ \w\w)', record[1] )
+				clip['type'], clip['location'], clip['dow'], clip['date'], clip['time'] = match.groups()
 
 			clip['body'] = "\n".join( record[3:] )
 
@@ -52,7 +56,10 @@ if __name__ == '__main__':
 		string = ("====== %s ======\n\n" % title).encode('utf-8')
 		output.write(string)
 		for item in data[title]:
-			string = ("  * %s ((%s. p.))\n" % ( item['body'], item['page'] )).encode('utf-8')
+			if item.has_key('page'):
+				string = ("  * %s ((%s. p.))\n" % ( item['body'], item['page'] )).encode('utf-8')
+			else:
+				string = ("  * %s  ((%s. loc.))\n" % ( item['body'], item['location'] )).encode('utf-8')
 			output.write(string)
 		output.close()
 
